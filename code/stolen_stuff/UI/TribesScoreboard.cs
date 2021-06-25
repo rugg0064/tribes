@@ -4,14 +4,17 @@ using Sandbox.UI.Construct;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Tribes;
 
 public class TribesScoreboard : Panel
 {
 	//public Panel header;
 	public Panel canvas; //The center shaded region, with alignment settings
 	List<TribesScoreboardObject> entryList;
+	private IList<String> cachedNames;
 	public TribesScoreboard()
 	{
+		cachedNames = getList();
 		entryList = new List<TribesScoreboardObject>();
 		StyleSheet.Load( "/stolen_stuff/UI/Scoreboard.scss" ); 
 		AddClass( "scoreboard" );
@@ -20,6 +23,7 @@ public class TribesScoreboard : Panel
 
 		canvas = Add.Panel( "canvas" );
 
+		/*
 		for ( int i = 0; i < 32; i++ )
 		{
 			Panel p1 = new Panel();
@@ -28,6 +32,7 @@ public class TribesScoreboard : Panel
 			TribesScoreboardObject o1 = new TribesScoreboardObject( 0, p1 );
 			addObject( o1 );
 		}
+		*/
 
 		/*
 		Panel p1 = new Panel();
@@ -43,10 +48,58 @@ public class TribesScoreboard : Panel
 		addObject( o1 );
 		addObject( o2 );
 		*/
+
+	}
+
+	private IList<String> getList()
+	{
+		return ((TribesGame)Game.Current).names;
+	}
+
+	public void printList<T>( IList<T> l )
+	{
+		for ( int i = 0; i < l.Count; i++ )
+		{
+			Log.Info( l[i] );
+		}
+	}
+
+	private void buildFromList()
+	{
+		IList<String> names = getList(); 
+		entryList.Clear();
+		for ( int i = 0; i < names.Count; i++ )
+		{
+			Panel p1 = new Panel();
+			p1.SetClass( "entryPanel", true );
+			p1.Add.Label( names[i] );
+			TribesScoreboardObject o1 = new TribesScoreboardObject( 0, p1 );
+			addObject( o1 );
+		}
 	}
 
 	public override void Tick()
 	{
+		buildFromList();
+		/*
+		IList<String> newList;
+		//Log.Info( "Tick" );
+		if(cachedNames != (newList = getList()) )
+		{
+			Log.Info( "Not the same!" );
+			cachedNames = newList;
+			entryList.Clear();
+			for ( int i = 0; i < cachedNames.Count; i++ )
+			{
+				Panel p1 = new Panel();
+				p1.SetClass( "entryPanel", true );
+				p1.Add.Label( cachedNames[i] );
+				TribesScoreboardObject o1 = new TribesScoreboardObject( 0, p1 );
+				addObject( o1 );
+			}
+		}
+		*/
+
 		base.Tick();
 		SetClass( "open", Input.Down( InputButton.Score ) );
 	}

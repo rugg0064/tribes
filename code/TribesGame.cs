@@ -25,6 +25,9 @@ namespace Tribes
 	[Library( "minimal" )]
 	public partial class TribesGame : Sandbox.Game
 	{
+		[Net]
+		public List<String> names { get; set; }
+
 		private int mainSeed;
 
 		private Vector3 position = new Vector3(-2053.71f,-1662.20f,-31.97f);
@@ -72,6 +75,19 @@ namespace Tribes
 			Log.Info( team + "ASDASDASDASDS" );
 			player.team = team;
 			player.Respawn();
+
+			names.Add( client.Name );
+		}
+
+		public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason )
+		{
+			base.ClientDisconnect( cl, reason );
+			names.Remove( cl.Name );
+		}
+
+		public override void Simulate( Client cl )
+		{
+			base.Simulate( cl );
 		}
 	}
 

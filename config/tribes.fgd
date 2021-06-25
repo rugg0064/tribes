@@ -43,7 +43,7 @@
 ]
 
 // 
-// MinimalExample.MinimalGame : Sandbox.Game 
+// Tribes.TribesGame : Sandbox.Game 
 // 
 @PointClass = minimal : ""
 [

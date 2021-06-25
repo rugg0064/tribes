@@ -2,7 +2,7 @@
 using Sandbox;
 using System;
 
-namespace MinimalExample
+namespace Tribes
 {
     public static class Utils
     {

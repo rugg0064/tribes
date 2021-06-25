@@ -1,7 +1,7 @@
 using Sandbox;
 using System.Runtime.InteropServices;
 
-namespace MinimalExample
+namespace Tribes
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct HeightMapVertex

@@ -15,7 +15,7 @@ public class Speedometer : Panel
     public override void Tick()
     {
         
-        MinimalExample.MinimalPlayer player = (MinimalExample.MinimalPlayer) Local.Pawn;
+        Tribes.MinimalPlayer player = (Tribes.MinimalPlayer) Local.Pawn;
         if ( player == null ) return;
 
         //Max = center 40%

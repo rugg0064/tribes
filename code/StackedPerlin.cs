@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace MinimalExample
+namespace Tribes
 {    	
 	public struct PerlinLayerData
 	{

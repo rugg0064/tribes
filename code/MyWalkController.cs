@@ -1,7 +1,7 @@
 
 using Sandbox;
 
-namespace MinimalExample
+namespace Tribes
 {
     class MyWalkController : Sandbox.WalkController
     {

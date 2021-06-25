@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 
 
-namespace MinimalExample
-{    public class Perlin
+namespace Tribes
+{    
+	public class Perlin
     {
 		public readonly int seed;
 		public readonly int unitsPerGrid;

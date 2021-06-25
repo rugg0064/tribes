@@ -60,30 +60,9 @@ ammo
 	}
 }
 
-speedometer
-{
-	position: absolute;
-	top: 50%;
-	background-color: #FFA71A;
-	width:64px;
-	margin-top: -32px;
-	right: 0%;
-	font-size: 64px;
-	color: #ff0;
-	mix-blend-mode: lighten;
-	font-family: Roboto;
-	label
-	{
-		text-shadow: 0px 0px 20px #f70a;
 
-		&.danger
-		{
-			color: #f00;
-		}
-	}
-}
 
 .dm_pistol .icon
 {
-	background-image: url( /ui/weapons/dm_pistol.png );
+
 }

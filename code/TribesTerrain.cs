@@ -124,6 +124,5 @@ namespace Tribes
 		{
 			return prop.Position + new Vector3( x * horizontalMultiplier, y * horizontalMultiplier, noise.getHeight(x,y) * height);
 		}
-        
-    }
+	}
 }

@@ -7,9 +7,10 @@ public class Speedometer : Panel
 {
     public Label Weapon;
     public Speedometer()
-    {
-        Weapon = Add.Label( "100", "speedometer" );
-        //Inventory = Add.Label( "100", "inventory" );
+	{
+		StyleSheet.Load( "/stolen_stuff/UI/Speedometer.scss" );
+		Weapon = Add.Label( "100", "speedometer" );
+		Weapon.Add.Panel( "corner" );
     }
 
     public override void Tick()

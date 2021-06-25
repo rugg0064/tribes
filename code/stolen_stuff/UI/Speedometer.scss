@@ -1,0 +1,40 @@
+speedometer {
+    position: absolute;
+    top: 50%;
+    background-color: #FFA71A;
+    width: 64px;
+    margin-top: -32px;
+    right: 0%;
+    font-size: 64px;
+    color: #ff0;
+    mix-blend-mode: lighten;
+    font-family: Roboto;
+    //xOff yOff Blur Spread
+    box-shadow: 0px 0px 20px #FFA71A;
+    overflow: hidden;
+    //clip-path: circle(10px);
+    //border-radius: 25px;
+    //border-corner-shape: bevel;
+
+
+    .corner {
+        position: absolute;
+        margin: -20px;
+        width: 64px;
+        height: 128px;
+        top: -20px;
+        right: -15px;
+        transform: rotate(45deg);
+        background-color: #000;
+        //background-color: #FFFFFFFF;
+        box-shadow: 0 0 0 250px #522d5b;
+    }
+
+    label {
+        text-shadow: 0px 0px 20px #f70a;
+
+        &.danger {
+            color: #f00;
+        }
+    }
+}

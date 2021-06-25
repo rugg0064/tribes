@@ -30,20 +30,28 @@ namespace Tribes
 		[Net]
 		public List<TribesScoreboardStruct> nameData { get; set; }
 		private Dictionary<String, int> playerIndicies;
-
-		private int mainSeed;
+		[Net]
+		public int mainSeed { get; set; }
 
 		private int teamNumbers;
 		private Random random;
 
 		private Vector3 position = new Vector3(-2053.71f,-1662.20f,-31.97f);
 		public TribesTerrain terrain;
+
+		public ModelEntity redFlag;
+		public ModelEntity bluFlag;
 		
 		//public int mainSeed;
 		public TribesGame()
 		{
 			if ( IsServer )
 			{
+				this.names = new List<String>();
+				this.nameData = new List<TribesScoreboardStruct>();
+				this.playerIndicies = new Dictionary<string, int>();
+				this.random = new Random();
+				this.mainSeed = random.Next();
 
 				// Create a HUD entity. This entity is globally networked
 				// and when it is created clientside it creates the actual
@@ -52,11 +60,6 @@ namespace Tribes
 				new DeathmatchHud();
 				new TribesCrosshairHud();
 
-				this.names = new List<String>();
-				this.nameData = new List<TribesScoreboardStruct>();
-				this.playerIndicies = new Dictionary<string, int>();
-				this.random = new Random();
-				this.mainSeed = random.Next();
 			}
 
 			if ( IsClient )
@@ -68,21 +71,18 @@ namespace Tribes
 		public override void PostLevelLoaded()
 		{
 			this.terrain = new TribesTerrain(mainSeed, position);
-			TribesTerrain terrain = this.terrain;
-			int size = terrain.vertSize;
-			int size1x = (int)(size * 0.1f);
-			int size2x = (int)(size * 0.9f);
 
-			Vector3 pos1 = terrain.getPos( size1x, size1x );
-			Vector3 pos2 = terrain.getPos( size2x, size2x );
 
-			ModelEntity t1 = new ModelEntity( "addsons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
-			t1.Spawn();
-			t1.Position = pos1;
+			redFlag = new ModelEntity( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
+			redFlag.SetupPhysicsFromModel( PhysicsMotionType.Static );
+			redFlag.Spawn();
 
-			ModelEntity t2 = new ModelEntity( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
-			t2.Spawn();
-			t2.Position = pos2;
+			bluFlag = new ModelEntity( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
+			bluFlag.SetupPhysicsFromModel( PhysicsMotionType.Static );
+			bluFlag.Spawn();
+
+			returnRedFlag();
+			returnBluFlag();
 		}
 
 		/// <summary>
@@ -113,7 +113,10 @@ namespace Tribes
 				playerIndicies.Add( client.Name, names.Count - 1 );
 			}
 
-			
+			//ModelEntity t = new ModelEntity( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
+			//t.Spawn();
+			//t.Position = player.Position;
+			//dAt.Parent = player;
 		}
 
 		public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason )
@@ -126,6 +129,26 @@ namespace Tribes
 		{
 			base.Simulate( cl );
 		}
-	}
 
+		public void returnRedFlag()
+		{
+			TribesTerrain terrain = this.terrain;
+			int size = terrain.vertSize;
+			int size1x = (int)(size * 0.1f);
+			int size2x = (int)(size * 0.9f);
+			Vector3 pos = terrain.getPos( size1x, size1x );
+			redFlag.Position = pos;
+		}
+
+		public void returnBluFlag()
+		{
+			TribesTerrain terrain = this.terrain;
+			int size = terrain.vertSize;
+			int size1x = (int)(size * 0.1f);
+			int size2x = (int)(size * 0.9f);
+			Vector3 pos2 = terrain.getPos( size2x, size2x );
+			bluFlag.Position = pos2;
+
+		}
+	}
 }

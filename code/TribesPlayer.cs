@@ -10,7 +10,8 @@ namespace Tribes
 		[Net]
 		public bool team{get; set;}
 		[Net, Local]
-		public float ammo {get;set;} = 100; 
+		public float ammo {get;set;} = 100;
+		public Entity flag;
 		public MinimalPlayer()
 		{
 			this.Inventory = new Inventory(this);
@@ -116,14 +117,14 @@ namespace Tribes
 				//MinimalGame.doThing(new Vector3(-400, -250, 200));
 				//Log.Info(Position);
 
+				/*
 				IList<TribesScoreboardStruct> data = ((TribesGame)Game.Current).nameData;
 				IList<String> names = ((TribesGame)Game.Current).names;
 				for (int i = 0; i < names.Count; i++ )
 				{
 					Log.Info( names[i].ToString() + " : " + data[i].ToString() );
 				}
-
-
+				*/
 			}
 		}
 
@@ -135,10 +136,24 @@ namespace Tribes
 			EnableDrawing = false;
 		}
 
-		[ClientRpc]
-		public void generateTerrain(int seed, Vector3 pos)
+		public override void StartTouch( Entity other )
 		{
-			TribesTerrain x = new TribesTerrain(seed, pos);
+			base.StartTouch( other );
+			/*
+			TribesGame cur = ((TribesGame)Game.Current);
+			if ( (other == cur.redFlag && this.team == false) || (other == cur.bluFlag && this.team == true))
+			{
+				other.Parent = this;
+			}
+			*/
 		}
+
+
+		[ClientRpc]
+		public void generateTerrain( int seed, Vector3 pos )
+		{
+			TribesTerrain x = new TribesTerrain( seed, pos );
+		}
+
 	}
 }

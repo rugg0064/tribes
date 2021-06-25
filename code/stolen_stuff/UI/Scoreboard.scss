@@ -57,12 +57,22 @@
 	.canvas {
 		//background-size: 100% 100%;
 		//background-position: center center;
-		background-color: #FFA71A1A;
-
+		//background-color: #40404010;
+		background-color: rgba( 65, 65, 65, 0.2);
 		flex-direction: column;
 		min-height: 10%;
 		min-width: 30%;
 		mix-blend-mode: lighten;
+
+		.entryPanel {
+			&.red {
+				background-color: rgba(255,0,0,16);
+			}
+
+			&.blu {
+				background-color: rgba(0,0,255,16);
+			}
+		}
 
 		.entry {
 			mix-blend-mode: lighten;
@@ -76,14 +86,6 @@
 
 			&.me {
 				background-color: #00aa;
-			}
-
-			&.red {
-				background-color: red;
-			}
-
-			&.blu {
-				background-color: blue;
 			}
 		}
 	}

@@ -11,10 +11,13 @@ namespace Tribes
     public class TribesTerrain
     {
         public Prop prop;
-        private int seed;
+		public int vertSize;
+		public float mapSize;
+		public float horizontalMultiplier;
+		public float height;
+
+		private int seed;
 		private StackedPerlin noise;
-		private float horizontalMultiplier;
-		private float height;
 		public TribesTerrain(int seed, Vector3 pos)
         {
             this.seed = seed;
@@ -24,7 +27,9 @@ namespace Tribes
 			
 			Mesh mesh = new Mesh(material);
 			int size = 128; // N * N
+			this.vertSize = size;
 			float squareSize = 8192;
+			this.mapSize = squareSize;
 			this.height = 512;
 			//int seed = 271;
 			float textureMultiplier = 0.25f;

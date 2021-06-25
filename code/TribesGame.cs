@@ -27,8 +27,14 @@ namespace Tribes
 	{
 		[Net]
 		public List<String> names { get; set; }
+		[Net]
+		public List<TribesScoreboardStruct> nameData { get; set; }
+		private Dictionary<String, int> playerIndicies;
 
 		private int mainSeed;
+
+		private int teamNumbers;
+		private Random random;
 
 		private Vector3 position = new Vector3(-2053.71f,-1662.20f,-31.97f);
 		public TribesTerrain terrain;
@@ -38,7 +44,6 @@ namespace Tribes
 		{
 			if ( IsServer )
 			{
-				this.mainSeed = new Random().Next();
 
 				// Create a HUD entity. This entity is globally networked
 				// and when it is created clientside it creates the actual
@@ -46,6 +51,12 @@ namespace Tribes
 				// this just feels like a nice neat way to do it.
 				new DeathmatchHud();
 				new TribesCrosshairHud();
+
+				this.names = new List<String>();
+				this.nameData = new List<TribesScoreboardStruct>();
+				this.playerIndicies = new Dictionary<string, int>();
+				this.random = new Random();
+				this.mainSeed = random.Next();
 			}
 
 			if ( IsClient )
@@ -56,7 +67,22 @@ namespace Tribes
 
 		public override void PostLevelLoaded()
 		{
-			this.terrain = new TribesTerrain(mainSeed, position);	
+			this.terrain = new TribesTerrain(mainSeed, position);
+			TribesTerrain terrain = this.terrain;
+			int size = terrain.vertSize;
+			int size1x = (int)(size * 0.1f);
+			int size2x = (int)(size * 0.9f);
+
+			Vector3 pos1 = terrain.getPos( size1x, size1x );
+			Vector3 pos2 = terrain.getPos( size2x, size2x );
+
+			ModelEntity t1 = new ModelEntity( "addsons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
+			t1.Spawn();
+			t1.Position = pos1;
+
+			ModelEntity t2 = new ModelEntity( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
+			t2.Spawn();
+			t2.Position = pos2;
 		}
 
 		/// <summary>
@@ -67,22 +93,33 @@ namespace Tribes
 			base.ClientJoined( client );
 
 			MinimalPlayer player = new MinimalPlayer();
-			//player.mainSeed = TribesGame.mainSeed;
 			client.Pawn = player;
 			player.generateTerrain(this.mainSeed, position);
-			bool team = true;
-			//bool team = new Random().Next( 0, 1 ) == 0;
-			Log.Info( team + "ASDASDASDASDS" );
-			player.team = team;
-			player.Respawn();
+			//If teams are equal, pick a random number, else pick the team which would approach equality
+			player.team = teamNumbers == 0 ? random.Next(0,2) == 0 : teamNumbers < 0;
+			teamNumbers += player.team ? 1 : -1;
 
-			names.Add( client.Name );
+			player.Respawn();
+				
+			if(playerIndicies.ContainsKey (client.Name ))
+			{
+				int index = playerIndicies[client.Name];
+				nameData[index] = new TribesScoreboardStruct( player.team );
+			}
+			else
+			{
+				names.Add( client.Name );
+				nameData.Add( new TribesScoreboardStruct( player.team ) );
+				playerIndicies.Add( client.Name, names.Count - 1 );
+			}
+
+			
 		}
 
 		public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason )
 		{
 			base.ClientDisconnect( cl, reason );
-			names.Remove( cl.Name );
+			//names.Remove( cl.Name );
 		}
 
 		public override void Simulate( Client cl )

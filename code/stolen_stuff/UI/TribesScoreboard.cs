@@ -8,146 +8,101 @@ using Tribes;
 
 public class TribesScoreboard : Panel
 {
-	//public Panel header;
 	public Panel canvas; //The center shaded region, with alignment settings
-	List<TribesScoreboardObject> entryList;
+
 	private IList<String> cachedNames;
+	private IList<TribesScoreboardStruct> cachedPlayerData;
 	public TribesScoreboard()
 	{
-		cachedNames = getList();
-		entryList = new List<TribesScoreboardObject>();
+		this.cachedNames = null;
+		this.cachedPlayerData = null;
+		//cachedNames = getNames();
+		//cachedPlayerData = getPlayerData();
+
 		StyleSheet.Load( "/stolen_stuff/UI/Scoreboard.scss" ); 
 		AddClass( "scoreboard" );
 		//With the TribesScoreboard panel being a scoreboard class, any children will have common text settings.
 		//Every component is then added to the canvas, which is the centered shaded part.
-
 		canvas = Add.Panel( "canvas" );
-
-		/*
-		for ( int i = 0; i < 32; i++ )
-		{
-			Panel p1 = new Panel();
-			p1.SetClass( "entryPanel", true );
-			p1.Add.Label( "User" + (i+1) );
-			TribesScoreboardObject o1 = new TribesScoreboardObject( 0, p1 );
-			addObject( o1 );
-		}
-		*/
-
-		/*
-		Panel p1 = new Panel();
-		p1.SetClass( "entryPanel", true);
-		p1.Add.Label( "User1" );
-		TribesScoreboardObject o1 = new TribesScoreboardObject( 0, p1 );
-		
-		Panel p2 = new Panel();
-		p2.SetClass( "entryPanel", true);
-		p2.Add.Label( "User2" );
-		TribesScoreboardObject o2 = new TribesScoreboardObject( 0, p2 );
-
-		addObject( o1 );
-		addObject( o2 );
-		*/
-
 	}
 
-	private IList<String> getList()
+	private IList<String> getNames()
 	{
 		return ((TribesGame)Game.Current).names;
 	}
 
-	public void printList<T>( IList<T> l )
+	private IList<TribesScoreboardStruct> getPlayerData()
 	{
-		for ( int i = 0; i < l.Count; i++ )
-		{
-			Log.Info( l[i] );
-		}
+		return ((TribesGame)Game.Current).nameData;
 	}
 
-	private void buildFromList()
+	public bool ensureUpToDate()
 	{
-		IList<String> names = getList(); 
-		entryList.Clear();
-		for ( int i = 0; i < names.Count; i++ )
+		IList<String> names = getNames();
+		IList<TribesScoreboardStruct> playerData = getPlayerData();
+		if ( cachedNames == null || cachedPlayerData == null )
 		{
-			Panel p1 = new Panel();
-			p1.SetClass( "entryPanel", true );
-			p1.Add.Label( names[i] );
-			TribesScoreboardObject o1 = new TribesScoreboardObject( 0, p1 );
-			addObject( o1 );
+			cachedNames = names;
+			cachedPlayerData = playerData;
+			return false;
 		}
+
+		if (cachedNames.Count != names.Count || cachedPlayerData.Count != playerData.Count)
+		{
+			cachedNames = names;
+			cachedPlayerData = playerData;
+			return false;
+		}
+		else
+		{
+			for (int i = 0; i < names.Count; i++)
+            {
+				if(cachedNames[i] != names[i] || !cachedPlayerData[i].Equals(playerData[i]))
+				{
+					cachedNames = names;
+					cachedPlayerData = playerData;
+					return false;
+				}
+            }
+		}
+		return true;
 	}
 
 	public override void Tick()
 	{
-		buildFromList();
-		/*
-		IList<String> newList;
-		//Log.Info( "Tick" );
-		if(cachedNames != (newList = getList()) )
-		{
-			Log.Info( "Not the same!" );
-			cachedNames = newList;
-			entryList.Clear();
-			for ( int i = 0; i < cachedNames.Count; i++ )
+		
+		//Log.Info( "Tick " );
+		if (!ensureUpToDate())
+        {
+			Log.Info( "Not up to date!" );
+			int curChildCount = canvas.ChildCount;
+			int correctChildCount = cachedNames.Count;
+			Log.Info( "cur vs correct: " + curChildCount + ", " + correctChildCount );
+			while(curChildCount < correctChildCount)
 			{
-				Panel p1 = new Panel();
-				p1.SetClass( "entryPanel", true );
-				p1.Add.Label( cachedNames[i] );
-				TribesScoreboardObject o1 = new TribesScoreboardObject( 0, p1 );
-				addObject( o1 );
+				Log.Info( "Creating new entryPanel" );
+				Panel p = canvas.Add.Panel( "entryPanel" );
+				p.Add.Label("to be filled");
+				curChildCount++;
 			}
-		}
-		*/
+
+			for ( int i = 0; i < correctChildCount; i++ )
+			{
+				Panel child = canvas.GetChild( i );
+				bool isRedTeam = cachedPlayerData[i].team;
+				child.SetClass( "red", isRedTeam );
+				child.SetClass( "blu", !isRedTeam );
+
+
+				Panel subchild = child.GetChild( 0 );
+				Label subChildLabel = (Label) subchild;
+				subChildLabel.Text = cachedNames[i].ToString();
+			}
+        }
+		//Log.Info( "Up to date!" );
+		
 
 		base.Tick();
 		SetClass( "open", Input.Down( InputButton.Score ) );
-	}
-
-	public void addObject( TribesScoreboardObject scoreObj )
-	{
-		int i = 0;
-		while(i < entryList.Count && scoreObj.priority <= entryList[i].priority)
-		{
-			i++;
-		}
-		entryList.Insert( i, scoreObj );
-		reorder();
-	}
-
-	//ASSUMES LIST IS ORDERED
-	public void reorder()
-	{
-		//entryList.Sort(new TribesScoreboardObjectComparer());
-		canvas.DeleteChildren( true );
-		for(int i = 0; i < entryList.Count; i++)
-		{
-			canvas.AddChild( entryList[i].panel );
-		}
-	}
-}
-
-public class TribesScoreboardObject
-{
-	public int priority;
-	public Panel panel;
-
-	public TribesScoreboardObject( int priority, Panel panel)
-	{
-		this.priority = priority;
-		this.panel = panel;
-	}
-}
-
-public class TribesScoreboardObjectComparer : System.Collections.Generic.Comparer<TribesScoreboardObject>
-{
-	public TribesScoreboardObjectComparer()
-	{
-
-	}
-
-	public override int Compare( TribesScoreboardObject x, TribesScoreboardObject y )
-	{
-		return x.priority - y.priority;
 	}
 }

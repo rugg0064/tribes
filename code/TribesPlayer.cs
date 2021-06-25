@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Tribes
 {
@@ -20,20 +21,24 @@ namespace Tribes
 			
 			//Log.Info(TribesGame.mainSeed);
 		
-			ammo = 100.0f;
+			this.ammo = 100.0f;
 			
 			SetModel("models/citizen/citizen.vmdl");
-			Controller = new MyWalkController();
-			Animator = new StandardPlayerAnimator();
-			Camera = new ThirdPersonCamera();
-
-			EnableAllCollisions = true;
-			EnableDrawing = true;
-			EnableHideInFirstPerson = true;
-			EnableShadowInFirstPerson = true;
+			this.Controller = new TribesWalkController();
+			this.Animator = new StandardPlayerAnimator();
+			this.Camera = new ThirdPersonCamera();
+			this.EnableAllCollisions = true;
+			this.EnableDrawing = true;
+			this.EnableHideInFirstPerson = true;
+			this.EnableShadowInFirstPerson = true;
 
 			base.Respawn();
-			Vector3 pos = ((TribesGame)Game.Current).terrain.getPos( 64, 64 ) + new Vector3(0,0,64);
+			setSliding( false );
+
+			TribesTerrain terrain = ((TribesGame)Game.Current).terrain;
+			int centerPos = terrain.vertSize / 2;
+			Vector3 pos = terrain.getPos( centerPos, centerPos ) + new Vector3(0,0,64);
+
 			Log.Info( "Moving to: " + pos );
 			//base.MoveTo( pos, 0.0f );
 			this.Position = pos;
@@ -46,6 +51,21 @@ namespace Tribes
 			}
 		}
 
+		private void setSliding(bool isSliding)
+		{
+			TribesWalkController c = (TribesWalkController)this.Controller;
+			if (isSliding)
+			{
+				c.MoveFriction = c.slidingMoveFriction;
+				c.GroundFriction = c.slidingMoveFriction;
+			}
+			else
+			{
+				c.MoveFriction = c.normalMoveFriction;
+				c.GroundFriction = c.normalGroundFriction;
+			}
+		}
+
 		/// <summary>
 		/// Called every tick, clientside and serverside.
 		/// </summary>
@@ -54,8 +74,12 @@ namespace Tribes
 			base.Simulate( cl );
 			SimulateActiveChild( cl, ActiveChild );
 
+			if(Input.Pressed(InputButton.Run) || Input.Released(InputButton.Run))
+			{
+				this.setSliding( Input.Down( InputButton.Run ) );
+			}
 
-			MyWalkController c = (MyWalkController) this.Controller;
+			/*MyWalkController c = (MyWalkController) this.Controller;
 			if(Input.Pressed(InputButton.Run))
 			{
 				c.MoveFriction = c.slidingMoveFriction;
@@ -65,9 +89,9 @@ namespace Tribes
 			{
 				c.MoveFriction = c.normalMoveFriction;
 				c.GroundFriction = c.normalGroundFriction;
-			}
-		
-			if(Input.Down(InputButton.Attack2) && this.GroundEntity == null && ammo > 0)
+			}*/
+
+			if ( Input.Down(InputButton.Attack2) && this.GroundEntity == null && ammo > 0)
 			{
 				this.Velocity += (new Vector3(0,0,1) * 750) * Time.Delta;
 				ammo -= 33 * Time.Delta;
@@ -85,12 +109,19 @@ namespace Tribes
 			if( Input.Pressed(InputButton.Attack1) )
 			{
 				//Log.Info(this.Position);
-				Log.Info( this.team );
+				//Log.Info( this.team );
 				//MinimalGame.doThing(this.EyePos + (this.EyeRot.Forward * 100));
 				//((MinimalGame) this.).doThing(Vector3.Zero);
 				//Log.Info(this.mainSeed);
 				//MinimalGame.doThing(new Vector3(-400, -250, 200));
 				//Log.Info(Position);
+
+				IList<TribesScoreboardStruct> data = ((TribesGame)Game.Current).nameData;
+				IList<String> names = ((TribesGame)Game.Current).names;
+				for (int i = 0; i < names.Count; i++ )
+				{
+					Log.Info( names[i].ToString() + " : " + data[i].ToString() );
+				}
 
 
 			}

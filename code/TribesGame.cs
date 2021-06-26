@@ -26,6 +26,8 @@ namespace Tribes
 	public partial class TribesGame : Sandbox.Game
 	{
 		[Net]
+		public ScoreStruct score { get; set; }
+		[Net]
 		public List<String> names { get; set; }
 		[Net]
 		public List<TribesScoreboardStruct> nameData { get; set; }
@@ -39,8 +41,8 @@ namespace Tribes
 		private Vector3 position = new Vector3(-2053.71f,-1662.20f,-31.97f);
 		public TribesTerrain terrain;
 
-		public ModelEntity redFlag;
-		public ModelEntity bluFlag;
+		public TribesFlag redFlag;
+		public TribesFlag bluFlag;
 		
 		//public int mainSeed;
 		public TribesGame()
@@ -52,6 +54,7 @@ namespace Tribes
 				this.playerIndicies = new Dictionary<string, int>();
 				this.random = new Random();
 				this.mainSeed = random.Next();
+				this.score = new ScoreStruct();
 
 				// Create a HUD entity. This entity is globally networked
 				// and when it is created clientside it creates the actual
@@ -73,13 +76,13 @@ namespace Tribes
 			this.terrain = new TribesTerrain(mainSeed, position);
 
 
-			redFlag = new ModelEntity( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
+			redFlag = new TribesFlag( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
 			redFlag.SetupPhysicsFromModel( PhysicsMotionType.Static );
-			redFlag.Spawn();
+			//redFlag.Spawn();
 
-			bluFlag = new ModelEntity( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
+			bluFlag = new TribesFlag( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
 			bluFlag.SetupPhysicsFromModel( PhysicsMotionType.Static );
-			bluFlag.Spawn();
+			//bluFlag.Spawn();
 
 			returnRedFlag();
 			returnBluFlag();
@@ -92,7 +95,7 @@ namespace Tribes
 		{
 			base.ClientJoined( client );
 
-			MinimalPlayer player = new MinimalPlayer();
+			TribesPlayer player = new TribesPlayer();
 			client.Pawn = player;
 			player.generateTerrain(this.mainSeed, position);
 			//If teams are equal, pick a random number, else pick the team which would approach equality
@@ -122,7 +125,6 @@ namespace Tribes
 		public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason )
 		{
 			base.ClientDisconnect( cl, reason );
-			//names.Remove( cl.Name );
 		}
 
 		public override void Simulate( Client cl )
@@ -135,20 +137,58 @@ namespace Tribes
 			TribesTerrain terrain = this.terrain;
 			int size = terrain.vertSize;
 			int size1x = (int)(size * 0.1f);
-			int size2x = (int)(size * 0.9f);
 			Vector3 pos = terrain.getPos( size1x, size1x );
 			redFlag.Position = pos;
+			bluFlag.stopFollowingBone();
 		}
 
 		public void returnBluFlag()
 		{
 			TribesTerrain terrain = this.terrain;
 			int size = terrain.vertSize;
-			int size1x = (int)(size * 0.1f);
 			int size2x = (int)(size * 0.9f);
-			Vector3 pos2 = terrain.getPos( size2x, size2x );
-			bluFlag.Position = pos2;
+			Vector3 pos = terrain.getPos( size2x, size2x );
+			bluFlag.Position = pos;
+			bluFlag.stopFollowingBone();
+		}
 
+		public void returnFlag(TribesFlag tfg)
+		{
+			if(tfg == bluFlag)
+			{
+				returnBluFlag();
+			}
+			else
+			{
+				returnRedFlag();
+			}
+		}
+
+		public void returnFlag(TribesPlayer p)
+		{
+			if ( p.flag != null )
+			{
+				returnFlag( p.flag );
+				p.flag = null;
+			}
+		}
+
+		public void givePoint(bool team)
+		{
+			if(team)
+			{
+				score = new ScoreStruct( score.red + 1, score.blu );
+			}
+			else
+			{
+				score = new ScoreStruct( score.red, score.blu + 1 );
+			}
+		}
+
+		public void givePoint( TribesPlayer player)
+		{
+			returnFlag( player );
+			givePoint( player.team );
 		}
 	}
 }

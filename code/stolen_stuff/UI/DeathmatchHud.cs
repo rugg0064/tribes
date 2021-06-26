@@ -17,6 +17,7 @@ public partial class DeathmatchHud : HudEntity<RootPanel>
 		RootPanel.AddChild<Ammo>();
 		RootPanel.AddChild<Speedometer>();
 		RootPanel.AddChild<TribesScoreboard>();
+		RootPanel.AddChild<PointsOverlay>();
 	}
 
 	[ClientRpc]

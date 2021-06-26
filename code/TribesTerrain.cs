@@ -18,6 +18,10 @@ namespace Tribes
 
 		private int seed;
 		private StackedPerlin noise;
+
+		//private float isNormalized;
+		private float normalizationSubtraction;
+		private float normalizationMultiplier;
 		public TribesTerrain(int seed, Vector3 pos)
         {
             this.seed = seed;
@@ -40,11 +44,11 @@ namespace Tribes
 				new PerlinLayerData(128, 0.30f),
 				new PerlinLayerData(128, 0.30f),
 				new PerlinLayerData(128, 0.30f),
-				new PerlinLayerData(8, 0.10f),
+				new PerlinLayerData(8,   0.10f),
 			});
 			this.noise = perlin;
-			
-			float[,] hm = Utils.normalizedMap(perlin.getMap(0, 0, size-1, size-1));
+
+			float[,] hm = this.normalizedMap(perlin.getMap(0, 0, size-1, size-1));
 
 			Vector3[]  vectors =   new Vector3[size*size];
 			HeightMapVertex[] verticies = new HeightMapVertex[size*size];
@@ -56,17 +60,17 @@ namespace Tribes
 				{
 					Vector3 vPos = vectors[(i*size) + j] = new Vector3( i * horizontalMultiplier, j * horizontalMultiplier, hm[i,j] * height);
 
-					float U = hm[i, j+1 >= size ? 0 : j+1] * height;
-					float D = hm[i, j - 1 < 0 ? size-1 : j-1] * height;
-					float R = hm[i+1 >= size ? 0 : i+1, j] * height;
-					float L = hm[i+1 >= size ? 0 : i+1, j] * height;
+					float U = hm[ i, j + 1 >= size ? 0 : j + 1 ] * height;
+					float D = hm[ i, j - 1 < 0 ? size-1 : j - 1 ] * height;
+					float R = hm[ i + 1 >= size ? 0 : i + 1, j ] * height;
+					float L = hm[ i - 1 < 0 ? size-1 : i - 1, j ] * height;
 
 					Vector3 vNormal = new Vector3( (R-L) / (2*horizontalMultiplier), (D-U) / (2*horizontalMultiplier), 1 ).Normal;
 					
 					Vector3 vTangent =  Vector3.Cross(vNormal, Vector3.Up);
 
 					Vector2 vTexCoord = new Vector2( i * textureMultiplier, j * textureMultiplier);
-					verticies[(i*size) + j] = new HeightMapVertex(vPos, vTangent, vNormal, Color.Green, vTexCoord);
+					verticies[(i*size) + j] = new HeightMapVertex(vPos, vTangent, vNormal, Color.Red, vTexCoord);
 				}
 			}
 
@@ -120,9 +124,36 @@ namespace Tribes
 			return (i * size) + j;
 		}
 
+		public float[,] normalizedMap( float[,] array )
+		{
+			float min = float.MaxValue;
+			float max = float.MinValue;
+
+			for ( int i = 0; i < array.GetLength( 0 ); i++ )
+			{
+				for ( int j = 0; j < array.GetLength( 1 ); j++ )
+				{
+					min = MathF.Min( min, array[i, j] );
+					max = MathF.Max( max, array[i, j] );
+				}
+			}
+			float multiplier = 1 / (max - min);
+			this.normalizationSubtraction = min;
+			this.normalizationMultiplier = multiplier;
+			float[,] map = new float[array.GetLength( 0 ), array.GetLength( 1 )];
+			for ( int i = 0; i < array.GetLength( 0 ); i++ )
+			{
+				for ( int j = 0; j < array.GetLength( 1 ); j++ )
+				{
+					map[i, j] = (array[i, j] - min) * multiplier;
+				}
+			}
+			return map;
+		}
+
 		public Vector3 getPos(int x, int y)
 		{
-			return prop.Position + new Vector3( x * horizontalMultiplier, y * horizontalMultiplier, noise.getHeight(x,y) * height);
+			return prop.Position + new Vector3( x * horizontalMultiplier, y * horizontalMultiplier, ((noise.getHeight(x,y) - this.normalizationSubtraction) * this.normalizationMultiplier) * height);
 		}
 	}
 }

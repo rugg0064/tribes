@@ -2,29 +2,29 @@ using Sandbox;
 using Sandbox.UI;
 using Sandbox.UI.Construct;
 using System;
+using Tribes;
 
 public class Speedometer : Panel
 {
-    public Label Weapon;
+	public Panel Spedometer;
     public Speedometer()
 	{
 		StyleSheet.Load( "/stolen_stuff/UI/Speedometer.scss" );
-		Weapon = Add.Label( "100", "speedometer" );
-		Weapon.Add.Panel( "corner" );
+		Spedometer = Add.Panel( "speedometer" );
     }
 
     public override void Tick()
     {
         
-        Tribes.MinimalPlayer player = (Tribes.MinimalPlayer) Local.Pawn;
+        Tribes.TribesPlayer player = (Tribes.TribesPlayer) Local.Pawn;
         if ( player == null ) return;
 
-        //Max = center 40%
-        //Left over 60%
-        //Top 30%
-        //Start at the bottom, top=70% height = 1%
+		//Max = center 40%
+		//Left over 60%
+		//Top 30%
+		//Start at the bottom, top=70% height = 1%
 
-        SetClass( "active", true );
+		SetClass( "active", true );
         
         
         float horizVel = player.Velocity.WithZ(0).Length;
@@ -48,8 +48,7 @@ public class Speedometer : Panel
         Style.Height = heightLength;
         Style.Top = topLength;
         Style.Dirty();
-        
-        Weapon.Text = "";
+		
         
     }
 }

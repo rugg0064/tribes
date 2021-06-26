@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 namespace Tribes
 {
-	partial class MinimalPlayer : Player
+	public partial class TribesPlayer : Player
 	{
 		[Net]
 		public bool team{get; set;}
 		[Net, Local]
 		public float ammo {get;set;} = 100;
-		public Entity flag;
-		public MinimalPlayer()
+		public TribesFlag flag;
+		public TribesPlayer()
 		{
 			this.Inventory = new Inventory(this);
 		}
@@ -125,6 +125,8 @@ namespace Tribes
 					Log.Info( names[i].ToString() + " : " + data[i].ToString() );
 				}
 				*/
+				ScoreStruct score = ((TribesGame)Game.Current).score;
+				Log.Info( "RED: " + score.red + ", BLU:  " + score.blu );
 			}
 		}
 
@@ -139,13 +141,36 @@ namespace Tribes
 		public override void StartTouch( Entity other )
 		{
 			base.StartTouch( other );
-			/*
+			Log.Info( "Touched" );
 			TribesGame cur = ((TribesGame)Game.Current);
-			if ( (other == cur.redFlag && this.team == false) || (other == cur.bluFlag && this.team == true))
+			Log.Info( cur.redFlag );
+
+			if(other is TribesFlag)
 			{
-				other.Parent = this;
+				TribesFlag collisionFlag = (TribesFlag)other;
+				TribesFlag myFlag = this.team ? cur.redFlag : cur.bluFlag;
+				TribesFlag otherFlag = this.team ? cur.bluFlag : cur.redFlag;
+
+				if(collisionFlag == myFlag)
+				{
+					if(this.flag != null)
+					{
+						cur.givePoint( this );
+					}
+				}
+				else
+				{
+					this.flag = collisionFlag;
+					collisionFlag.followPlayer( this );
+					
+				}
+				/*
+				if ( (otherTFG == cur.redFlag && this.team == false) || (otherTFG == cur.bluFlag && this.team == true))
+				{
+					otherTFG.followBone( this, this.GetBoneIndex( "spine_2" ) );
+				}
+				*/
 			}
-			*/
 		}
 
 

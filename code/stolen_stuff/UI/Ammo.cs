@@ -14,8 +14,8 @@ public class Ammo : Panel
     }
 
     public override void Tick()
-    {
-        Tribes.MinimalPlayer player = (Tribes.MinimalPlayer) Local.Pawn;
+	{
+        Tribes.TribesPlayer player = (Tribes.TribesPlayer) Local.Pawn;
         if ( player == null ) return;
 
         //Log.Info(player.ammo);

@@ -25,10 +25,11 @@ namespace Tribes
 		public TribesTerrain(int seed, Vector3 pos)
         {
             this.seed = seed;
-            Material material = Material.Load( "materials/4_grass.vmat" );
+            //Material material = Material.Load( "materials/4_grass.vmat" );
+			Material material = Material.Load( "materials/grassmat.vmat" );
 			//Material material = Material.Load( "materials/dev/black_grid_8.vmat" );
 			//Material material = Material.Load( "materials/dev/dev_measuregeneric01.vmat" );
-			
+
 			Mesh mesh = new Mesh(material);
 			int size = 128; // N * N
 			this.vertSize = size;
@@ -36,7 +37,8 @@ namespace Tribes
 			this.mapSize = squareSize;
 			this.height = 512;
 			//int seed = 271;
-			float textureMultiplier = 0.25f;
+			//float textureMultiplier = 0.25f;
+			float textureMultiplier = 0.25f * 2;
 			
 			//Perlin perlin = new Perlin(seed, 8);
 			StackedPerlin perlin = new StackedPerlin(seed, new PerlinLayerData[]
@@ -73,7 +75,7 @@ namespace Tribes
 					verticies[(i*size) + j] = new HeightMapVertex(vPos, vTangent, vNormal, Color.Red, vTexCoord);
 				}
 			}
-
+			
 			mesh.CreateVertexBuffer<HeightMapVertex>(
 				size*size*6,
 				new VertexAttribute[]{
@@ -102,7 +104,7 @@ namespace Tribes
 			}
 			mesh.CreateIndexBuffer( triangles.Length, triangles);
 			mesh.SetIndexRange(0, triangles.Length);
-
+			
 			Model model = new ModelBuilder()
 				.AddMesh( mesh )
 				.AddCollisionMesh(vectors, triangles)
@@ -113,6 +115,7 @@ namespace Tribes
 			p.SetModel( model );
 			p.Position = pos;
 			p.Spawn();
+			p.EnableShadowCasting = true;
 			p.PhysicsBody.BodyType = PhysicsBodyType.Static;
             
 			DebugOverlay.Box(9999f, p.Position, p.Position + new Vector3(squareSize, squareSize, height), Color.Green, true);

@@ -38,7 +38,7 @@ namespace Tribes
 		private int teamNumbers;
 		private Random random;
 
-		private Vector3 position = new Vector3(-2053.71f,-1662.20f,-31.97f);
+		private Vector3 position = new Vector3(-4096,-4096,-1024);
 		public TribesTerrain terrain;
 
 		public TribesFlag redFlag;

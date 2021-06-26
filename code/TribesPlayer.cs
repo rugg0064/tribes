@@ -18,7 +18,7 @@ namespace Tribes
 		}
 		public override void Respawn()
 		{
-			Log.Info("RESPAWNING: " + (IsServer ? "SERVER" : "CLIENT"));
+			//Log.Info("RESPAWNING: " + (IsServer ? "SERVER" : "CLIENT"));
 			
 			//Log.Info(TribesGame.mainSeed);
 		
@@ -40,15 +40,12 @@ namespace Tribes
 			int centerPos = terrain.vertSize / 2;
 			Vector3 pos = terrain.getPos( centerPos, centerPos ) + new Vector3(0,0,64);
 
-			Log.Info( "Moving to: " + pos );
-			//base.MoveTo( pos, 0.0f );
 			this.Position = pos;
 			if (this.Inventory != null)
 			{
 				Inventory.DeleteContents();
 				Pistol pistol;
 				Inventory.Add( pistol = new Pistol(), true );
-				//Log.Info(pistol.PrimaryRate);
 			}
 		}
 
@@ -67,9 +64,6 @@ namespace Tribes
 			}
 		}
 
-		/// <summary>
-		/// Called every tick, clientside and serverside.
-		/// </summary>
 		public override void Simulate( Client cl )
 		{
 			base.Simulate( cl );
@@ -79,18 +73,6 @@ namespace Tribes
 			{
 				this.setSliding( Input.Down( InputButton.Run ) );
 			}
-
-			/*MyWalkController c = (MyWalkController) this.Controller;
-			if(Input.Pressed(InputButton.Run))
-			{
-				c.MoveFriction = c.slidingMoveFriction;
-				c.GroundFriction = c.slidingMoveFriction;
-			}
-			if(Input.Released(InputButton.Run))
-			{
-				c.MoveFriction = c.normalMoveFriction;
-				c.GroundFriction = c.normalGroundFriction;
-			}*/
 
 			if ( Input.Down(InputButton.Attack2) && this.GroundEntity == null && ammo > 0)
 			{
@@ -109,24 +91,7 @@ namespace Tribes
 
 			if( Input.Pressed(InputButton.Attack1) )
 			{
-				//Log.Info(this.Position);
-				//Log.Info( this.team );
-				//MinimalGame.doThing(this.EyePos + (this.EyeRot.Forward * 100));
-				//((MinimalGame) this.).doThing(Vector3.Zero);
-				//Log.Info(this.mainSeed);
-				//MinimalGame.doThing(new Vector3(-400, -250, 200));
-				//Log.Info(Position);
 
-				/*
-				IList<TribesScoreboardStruct> data = ((TribesGame)Game.Current).nameData;
-				IList<String> names = ((TribesGame)Game.Current).names;
-				for (int i = 0; i < names.Count; i++ )
-				{
-					Log.Info( names[i].ToString() + " : " + data[i].ToString() );
-				}
-				*/
-				ScoreStruct score = ((TribesGame)Game.Current).score;
-				Log.Info( "RED: " + score.red + ", BLU:  " + score.blu );
 			}
 		}
 
@@ -141,9 +106,7 @@ namespace Tribes
 		public override void StartTouch( Entity other )
 		{
 			base.StartTouch( other );
-			Log.Info( "Touched" );
 			TribesGame cur = ((TribesGame)Game.Current);
-			Log.Info( cur.redFlag );
 
 			if(other is TribesFlag)
 			{

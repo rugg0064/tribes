@@ -5,16 +5,20 @@ namespace Tribes
 {
     class TribesWalkController : Sandbox.WalkController
     {
-        //public override float GroundFriction = 0;
-        //public override float MoveFriction = 0;
+		//public float GroundAngle { get; set; } = 46.0f;
+		//public new float GroundAngle { get; set; } = 9999f;
 
-        public float slidingGroundFriction = 0.1f;
+		//public override float GroundFriction = 0;
+		//public override float MoveFriction = 0;
+
+		public float slidingGroundFriction = 0.1f;
         public float slidingMoveFriction = 0.1f;
         public float normalGroundFriction = 4f;
         public float normalMoveFriction = 1f;
 
         public TribesWalkController() : base()
 		{
+			//GroundAngle = -99999f;
             GroundFriction = normalGroundFriction;
             MoveFriction = normalMoveFriction;
             MaxNonJumpVelocity = 50f;
@@ -39,19 +43,9 @@ namespace Tribes
 
 			Accelerate( wishdir, wishspeed, 0, Acceleration );
             Velocity = Velocity.WithZ( 0 );
-            Velocity = Velocity.ClampLength(1200);
 
-			//   Player.SetAnimParam( "forward", Input.Forward );
-			//   Player.SetAnimParam( "sideward", Input.Right );
-			//   Player.SetAnimParam( "wishspeed", wishspeed );
-			//    Player.SetAnimParam( "walkspeed_scale", 2.0f / 190.0f );
-			//   Player.SetAnimParam( "runspeed_scale", 2.0f / 320.0f );
+            Velocity = Velocity.ClampLength(2000);
 
-			//  DebugOverlay.Text( 0, Pos + Vector3.Up * 100, $"forward: {Input.Forward}\nsideward: {Input.Right}" );
-             
-            
-            //DebugOverlay.ScreenText(new Vector2(50,50), 1, new Color(0,250,0), "ASD", 1.0f);
-			// Add in any base velocity to the current velocity.
 			Velocity += BaseVelocity;
 
 			try

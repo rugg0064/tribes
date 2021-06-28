@@ -6,7 +6,6 @@
 	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
 	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
 	disableshadows(boolean) [ group="Render Properties" ] : "Disable shadow casting" : 0 : "Disable shadow casting for this entity"
-
 ]
 
 // 
@@ -17,7 +16,6 @@
 	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
 	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
 	disableshadows(boolean) [ group="Render Properties" ] : "Disable shadow casting" : 0 : "Disable shadow casting for this entity"
-
 ]
 
 // 
@@ -28,7 +26,6 @@
 	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
 	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
 	disableshadows(boolean) [ group="Render Properties" ] : "Disable shadow casting" : 0 : "Disable shadow casting for this entity"
-
 ]
 
 // 
@@ -39,7 +36,6 @@
 	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
 	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
 	disableshadows(boolean) [ group="Render Properties" ] : "Disable shadow casting" : 0 : "Disable shadow casting for this entity"
-
 ]
 
 // 

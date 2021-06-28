@@ -1,0 +1,133 @@
+﻿/*
+.scoreboard {
+	font-family: Roboto;
+	font-size: 23px;
+	font-weight: 500;
+	text-align: center;
+	color: white;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: all 0.1s ease-out;
+	transform: scale( 1.05 );
+	transform-origin: 50% 50%;
+
+
+	&.open {
+		opacity: 1;
+		transform: scale( 1 );
+	}
+
+	.header {
+		font-weight: 500;
+		border-bottom: 3px solid #fc0;
+		min-width: 30%;
+		margin-bottom: 10px;
+		//padding-bottom: 5px;
+		color: #fc0;
+		mix-blend-mode: lighten;
+	}
+
+	.canvas {
+		background-color: rgba( 65, 65, 65, 0.2);
+		flex-direction: column;
+		min-height: 10%;
+		min-width: 30%;
+		mix-blend-mode: lighten;
+
+		.entryPanel {
+			flex-direction: row;
+			width: 100%;
+
+			.entry {
+				margin-right: 100px;
+				max-width: 100%;
+				color: green;
+			}
+
+			&.red {
+				background-color: rgba(255,0,0,16);
+			}
+
+			&.blu {
+				background-color: rgba(0,0,255,16);
+			}
+		}
+	}
+
+	.legend {
+		flex-direction: row;
+		width: 100%;
+
+		.legendEntry {
+			margin-right: 100px;
+		}
+	}
+}
+*/
+
+.scoreboard {
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+
+	&.open {
+		opacity: 1;
+	}
+
+	.canvas {
+		padding: 0px;
+		margin: 0px 0px;
+		//background-color: rgba(128 128 128, 0.5);
+		//background-color: rgba(121, 165, 8, 1.0);
+		background-image: linear-gradient(to bottom, rgba(126, 168, 9, 0.8), rgba(86, 130, 10, 0.8));
+		position: absolute;
+		width: 40%;
+		//height: 30%;
+		min-height: 30%;
+		left: 30%;
+		top: 30%;
+		align-items: center;
+		justify-content: start;
+		//font-family: opendyslexic3-regular, Poppins, sans-sarif;
+		font-family: opendyslexic3-regular;
+		font-weight: 400;
+		color: white;
+		font-size: 40px;
+		flex-direction: column;
+
+		.header {
+			width: 100%;
+			align-items: start;
+			height: 90px;
+
+			.subheader {
+				padding: 10px;
+				padding-top: 0px;
+				//background-color: black;
+				border-bottom: 5px solid black;
+			}
+		}
+
+		.entryTable {
+			padding: 10px;
+			padding-top: 0px;
+			font-family: opendyslexic3-regular;
+			//background-color: rgba(100, 100, 100, 0.2);
+			font-weight: 600;
+			font-size: 20px;
+			width: 100%;
+			flex-direction: column;
+
+			.entryRow {
+				width: 100%;
+
+				.name {
+				}
+			}
+		}
+	}
+}

@@ -72,7 +72,6 @@ namespace Tribes
 			}
 			finally
 			{
-
 				// Now pull the base velocity back out.   Base velocity is set if you are on a moving object, like a conveyor (or maybe another monster?)
 				Velocity -= BaseVelocity;
 			}

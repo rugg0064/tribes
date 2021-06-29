@@ -21,8 +21,8 @@ public class PointsOverlay : Panel
 	}
 	public override void Tick()
 	{
-		ScoreStruct curScore = ((TribesGame)Game.Current).score;
-		red.Text = curScore.red.ToString();
-		blu.Text = curScore.blu.ToString();
+		TribesGame curGame = (TribesGame)Game.Current;
+		red.Text = curGame.redScore.ToString();
+		blu.Text = curGame.bluScore.ToString();
 	}
 }

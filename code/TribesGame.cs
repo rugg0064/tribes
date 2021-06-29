@@ -29,14 +29,13 @@ namespace Tribes
 		public Prop platform2;
 
 		[Net]
-		public ScoreStruct score { get; set; }
+		public List<TribesScoreboardStruct> playerScores { get; private set; }
 		[Net]
-		public List<String> names { get; set; }
+		public int redScore { get; private set; }
 		[Net]
-		public List<TribesScoreboardStruct> currentPlayers { get; set; }
-		private Dictionary<String, int> playerIndicies;
+		public int bluScore { get; private set; }
 		[Net]
-		public int mainSeed { get; set; }
+		public int mainSeed { get; private set; }
 
 		private int teamNumbers;
 		private Random random;
@@ -51,34 +50,36 @@ namespace Tribes
 		//public int mainSeed;
 		public TribesGame()
 		{
-			StackedPerlin perlin = new StackedPerlin( mainSeed, new PerlinLayerData[]
+			if( IsServer)
 			{
-				new PerlinLayerData(32, 0.70f),
-				new PerlinLayerData(64, 0.30f),
-				//new PerlinLayerData(16,  0.10f),
-				//new PerlinLayerData(8,   0.10f)
-			} );
-			noise = new ModifiedNoise<StackedPerlin>( perlin );
-			List<Func<float, float>> list = new List<Func<float, float>>();
-			list.Add( ( f ) => { return f * f; } );
-			list.Add( ( f ) => { return f - 0.1f; } );
-			//list.Add( ( f ) => { return MathF.Max(0.0f + MathF.Abs(f / 100), f); } );
-			list.Add( ( f ) => { return MathF.Max(0.0f + MathF.Abs(f / 1000000f), f); } );
-			noise.modifierList = list;
+				this.random = new Random();
+				this.mainSeed = random.Next();
+
+				StackedPerlin perlin = new StackedPerlin( this.mainSeed, new PerlinLayerData[]
+				{
+					new PerlinLayerData(32, 0.70f),
+					new PerlinLayerData(64, 0.30f),
+					//new PerlinLayerData(16,  0.10f),
+					//new PerlinLayerData(8,   0.10f)
+				} );
+				noise = new ModifiedNoise<StackedPerlin>( perlin );
+				List<Func<float, float>> list = new List<Func<float, float>>();
+				list.Add( ( f ) => { return f * f; } );
+				list.Add( ( f ) => { return f - 0.1f; } );
+				//list.Add( ( f ) => { return MathF.Max(0.0f + MathF.Abs(f / 100), f); } );
+				list.Add( ( f ) => { return MathF.Max( 0.0f + MathF.Abs( f / 1000000f ), f ); } );
+				noise.modifierList = list;
+			}
+
+			
 
 			if ( IsServer )
 			{
-				this.names = new List<String>();
-				this.currentPlayers = new List<TribesScoreboardStruct>();
-				this.playerIndicies = new Dictionary<string, int>();
-				this.random = new Random();
-				this.mainSeed = random.Next();
-				this.score = new ScoreStruct();
+				this.playerScores = new List<TribesScoreboardStruct>();
+				
+				this.redScore = this.bluScore = 0;
 
 				new TribesUI();
-				//new DeathmatchHud();
-				//new TribesCrosshairHud();
-
 			}
 
 			if ( IsClient )
@@ -89,19 +90,14 @@ namespace Tribes
 
 		public override void PostLevelLoaded()
 		{
-			//this.terrain = new TribesTerrain(mainSeed, position);
-			
 			terrain = new TribesTerrain<ModifiedNoise<StackedPerlin>>( position , noise);
-
 
 			redFlag = new TribesFlag( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
 			redFlag.SetupPhysicsFromModel( PhysicsMotionType.Static );
-			//redFlag.Spawn();
 
 			bluFlag = new TribesFlag( "addons/rust/models/rust_props/ladder_set/ladder_300.vmdl" );
 			bluFlag.SetupPhysicsFromModel( PhysicsMotionType.Static );
 			
-
 			int size = terrain.vertSize;
 			int size1x = (int)(size * 0.1f);
 			int size2x = (int)(size * 0.9f);
@@ -116,18 +112,6 @@ namespace Tribes
 			p1.Position = this.terrain.getPos( size1x, size1x );
 
 			Vector3 normal1 = terrain.getNormal( size1x, size1x );
-			/*
-			Vector3 normal1 = Vector3.Zero;
-			int amountToDo = 3;
-			for(int i = -amountToDo; i < amountToDo; i++)
-			{
-				for(int j = -amountToDo; j < amountToDo; j++)
-				{
-					normal1 += terrain.getNormal( i + size1x, j + size1x );
-				}
-			}
-			normal1 /= (1 + (amountToDo * 2)) + (1 + (amountToDo * 2));
-			*/
 
 			Angles angles1 = normal1.EulerAngles;
 			angles1.pitch += rollMod;
@@ -141,26 +125,10 @@ namespace Tribes
 			p2.SetupPhysicsFromModel( PhysicsMotionType.Static, false );
 			p2.Position = this.terrain.getPos( size2x, size2x );
 
-			/*
-			Vector3 normal2 = Vector3.Zero;
-			for ( int i = -amountToDo; i < amountToDo; i++ )
-			{
-				for ( int j = -amountToDo; j < amountToDo; j++ )
-				{
-
-					normal2 += terrain.getNormal( i + size1x, j + size1x );
-				}
-			}
-			normal2 /= (1 + (amountToDo * 2)) + (1 + (amountToDo * 2));
-			*/
-
 			Vector3 normal2 = terrain.getNormal( size2x, size2x );
 			Angles angles2 = normal2.EulerAngles;
 			angles2.pitch += rollMod;
 			p2.Rotation = Rotation.From( angles2 );
-
-			//DebugOverlay.Line( p1.Position, p1.Position + (normal2 * 1000), Color.Red,  999999f, false);
-			//DebugOverlay.Line( p2.Position, p2.Position + (normal2 * 1000), Color.Red, 999999f, false );
 
 			returnRedFlag();
 			returnBluFlag();
@@ -190,9 +158,9 @@ namespace Tribes
 			}
 		}
 
-
 		public override void ClientJoined( Client client )
 		{
+			Log.Info( client.SteamId );
 			base.ClientJoined( client );
 
 			TribesPlayer player = new TribesPlayer();
@@ -204,19 +172,57 @@ namespace Tribes
 
 			player.Respawn();
 				
-			names.Add( client.Name );
-			currentPlayers.Add( new TribesScoreboardStruct( player.team ) );
-			playerIndicies.Add( client.Name, names.Count - 1 );
+			playerScores.Add( new TribesScoreboardStruct( client.NetworkIdent, player.team ) );
+
+			player.generateTerrain( position );
 		}
 
 		public override void ClientDisconnect( Client cl, NetworkDisconnectionReason reason )
 		{
 			base.ClientDisconnect( cl, reason );
-			int index = playerIndicies[cl.Name];
-			names.RemoveAt( index );
-			currentPlayers.RemoveAt( index );
-			playerIndicies.Remove( cl.Name );
+			bool found = false;
+			for(int i = 0; i < playerScores.Count && !found; i++)
+			{
+				if(playerScores[i].netID == cl.NetworkIdent)
+				{
+					playerScores.RemoveAt( i );
+					found = true;
+				}
+			}
+			//int index = playerIndicies[cl.Name];
+			//playerNames.RemoveAt( index );
+			//playerScores.RemoveAt( index );
+			//playerIndicies.Remove( cl.Name );
 		}
+
+		public void gotDied( Client c )
+		{
+			bool found = false;
+			for ( int i = 0; i < playerScores.Count && !found; i++ )
+			{
+				if ( playerScores[i].netID == c.NetworkIdent )
+				{
+					found = true;
+					Log.Info( "dying" );
+					playerScores[i] = playerScores[i].giveDeath();
+				}
+			}
+		}
+
+		public void gotKilled( Client c )
+		{
+			bool found = false;
+			for ( int i = 0; i < playerScores.Count && !found; i++ )
+			{
+				if ( playerScores[i].netID == c.NetworkIdent )
+				{
+					found = true;
+					Log.Info( "dying" );
+					playerScores[i] = playerScores[i].giveKill();
+				}
+			}
+		}
+
 
 		public override void Simulate( Client cl )
 		{
@@ -268,11 +274,11 @@ namespace Tribes
 		{
 			if(team)
 			{
-				score = new ScoreStruct( score.red + 1, score.blu );
+				redScore++;
 			}
 			else
 			{
-				score = new ScoreStruct( score.red, score.blu + 1 );
+				bluScore++;
 			}
 		}
 

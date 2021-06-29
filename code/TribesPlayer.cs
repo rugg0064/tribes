@@ -10,6 +10,7 @@ namespace Tribes
 		private Particles particleL;
 		private Particles particleR;
 		private bool drawParticle;
+		private DamageInfo lastDamageInfo;
 
 		[Net]
 		public bool team{get; set;}
@@ -103,6 +104,7 @@ namespace Tribes
 			//Log.Info( "I took damage!" );
 			//Log.Info( info.Damage );
 			//Log.Info( info.Flags );
+			lastDamageInfo = info;
 		}
 		
 		private void setSliding(bool isSliding)
@@ -159,6 +161,7 @@ namespace Tribes
 
 		public override void OnKilled()
 		{
+			//Log.Info( "died!" );
 			base.OnKilled();
 			
 			Inventory.DeleteContents();
@@ -169,7 +172,13 @@ namespace Tribes
 				TribesGame cur = ((TribesGame)Game.Current);
 				cur.returnFlag( this.flag );
 			}
+			TribesGame cur2 = ((TribesGame)Game.Current);
+			//Log.Info( IsServer );
+			cur2.gotDied( this.GetClientOwner() );
+			cur2.gotKilled( lastDamageInfo.Attacker.GetClientOwner() );
 		}
+
+
 
 		public override void StartTouch( Entity other )
 		{
@@ -194,7 +203,23 @@ namespace Tribes
 		[ClientRpc]
 		public void generateTerrain( Vector3 pos )
 		{
-			var x = new TribesTerrain<ModifiedNoise<StackedPerlin>>( pos, ( (TribesGame)Game.Current).noise );
+			int mainSeed = ((TribesGame)Game.Current).mainSeed;
+			StackedPerlin perlin = new StackedPerlin( mainSeed, new PerlinLayerData[]
+			{
+				new PerlinLayerData(32, 0.70f),
+				new PerlinLayerData(64, 0.30f),
+				//new PerlinLayerData(16,  0.10f),
+				//new PerlinLayerData(8,   0.10f)
+			} );
+			ModifiedNoise <StackedPerlin> noise = new ModifiedNoise<StackedPerlin>( perlin );
+			List<Func<float, float>> list = new List<Func<float, float>>();
+			list.Add( ( f ) => { return f * f; } );
+			list.Add( ( f ) => { return f - 0.1f; } );
+			//list.Add( ( f ) => { return MathF.Max(0.0f + MathF.Abs(f / 100), f); } );
+			list.Add( ( f ) => { return MathF.Max( 0.0f + MathF.Abs( f / 1000000f ), f ); } );
+			noise.modifierList = list;
+
+			var x = new TribesTerrain<ModifiedNoise<StackedPerlin>>( pos, noise );
 		}
 
 	}

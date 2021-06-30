@@ -65,7 +65,24 @@ namespace Tribes
 			
 		}
 
-		
+		public override void CreateHull()
+		{
+			CollisionGroup = CollisionGroup.Player;
+			AddCollisionLayer( CollisionLayer.Player );
+			//SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, new Vector3( -16, -16, 0 ), new Vector3( 16, 16, 72 ) );
+
+			var capsule = new Capsule( new Vector3( 0, 0, 16 ), new Vector3( 0, 0, 72 - 16 ), 16 );
+			var phys = SetupPhysicsFromCapsule( PhysicsMotionType.Keyframed, capsule );
+
+			//	phys.GetBody(0).RemoveShadowController();
+
+			// TODO - investigate this? if we don't set movetype then the lerp is too much. Can we control lerp amount?
+			// if so we should expose that instead, that would be awesome.
+			MoveType = MoveType.MOVETYPE_WALK;
+			EnableHitboxes = true;
+		}
+
+
 		[Event.Frame]
 		private void doThing()
 		{
@@ -85,17 +102,13 @@ namespace Tribes
 			{
 				posL = GetBoneTransform( GetBoneIndex( "ankle_L" ), true ).Position;
 				posR = GetBoneTransform( GetBoneIndex( "ankle_R" ), true ).Position;
-
-				
 			}
 			else
 			{
 				posL = posR = Vector3.Zero;
 			}
-			particleL.SetPos( 0, posL );
-			particleR.SetPos( 0, posR );
-
-
+			particleL.SetPosition( 0, posL );
+			particleR.SetPosition( 0, posR );
 		}
 
 		public override void TakeDamage( DamageInfo info )
@@ -123,14 +136,14 @@ namespace Tribes
 				c.GroundFriction = c.normalGroundFriction;
 			}
 		}
-		
+
 
 		public override void Simulate( Client cl )
 		{
 			base.Simulate( cl );
 			SimulateActiveChild( cl, ActiveChild );
 
-			if(Input.Pressed(InputButton.Run) || Input.Released(InputButton.Run))
+			if (Input.Pressed(InputButton.Run) || Input.Released(InputButton.Run))
 			{
 				this.setSliding( Input.Down( InputButton.Run ) );
 			}

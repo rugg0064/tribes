@@ -42,6 +42,7 @@ public class Perlin : NoiseGenerator
 
 			n0 = dotGradient(x, y, gridCoordX1, gridCoordY1);
 			n1 = dotGradient(x, y, gridCoordX2, gridCoordY1);
+
 			ix0 = MathX.LerpTo(n0, n1, xInterp);
 
 			n0 = dotGradient(x, y, gridCoordX1, gridCoordY2);

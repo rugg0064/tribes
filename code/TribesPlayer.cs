@@ -114,15 +114,12 @@ namespace Tribes
 		public override void TakeDamage( DamageInfo info )
 		{
 			base.TakeDamage( info );
-			//Log.Info( "I took damage!" );
-			//Log.Info( info.Damage );
-			//Log.Info( info.Flags );
 			lastDamageInfo = info;
 		}
 		
 		private void setSliding(bool isSliding)
 		{
-			TribesWalkController c = (TribesWalkController)this.Controller;
+			TribesWalkController c = (TribesWalkController) this.Controller;
 			if (isSliding)
 			{
 				c.GroundAngle = -999999f;
@@ -168,7 +165,23 @@ namespace Tribes
 			}
 			if( Input.Pressed(InputButton.Attack1) )
 			{
-
+				Vector3 position = EyePos + (EyeRot.Forward * 128);
+				Perlin p = new Perlin( new Random().Next(), 8 );
+				float max = -9999f;
+				float min= 9999f;
+				for ( int i = 0; i < 64; i++ )
+				{
+					for ( int j = 0; j < 64; j++ )
+					{
+						float v = p.getHeight( i, j );
+						max = MathF.Max( max, v );
+						min = MathF.Min( min, v );
+						//Log.Info( v );
+						//DebugOverlay.Sphere( position + new Vector3( i, j, 0 ) * 64, (((float)Math.Abs( v )) * 50) + 0, Color.White, false, 10f );
+					}
+				}
+				Log.Info( min );
+				Log.Info( max );
 			}
 		}
 

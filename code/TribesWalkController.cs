@@ -18,7 +18,7 @@ namespace Tribes
 
         public TribesWalkController() : base()
 		{
-			//GroundAngle = -99999f;
+			GroundAngle = -99999f;
             GroundFriction = normalGroundFriction;
             MoveFriction = normalMoveFriction;
             MaxNonJumpVelocity = 50f;

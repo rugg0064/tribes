@@ -62,7 +62,6 @@ namespace Tribes
 				Pistol pistol;
 				Inventory.Add( pistol = new Pistol(), true );
 			}
-			
 		}
 
 		public override void CreateHull()
